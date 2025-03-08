@@ -34,23 +34,23 @@ jobs:
     - name: Terraform Validate
       run: terraform validate
 
-    - name: Terraform Plan
-      run: terraform plan
+    # - name: Terraform Plan
+    #   run: terraform plan
 
     - name: Terraform Apply
       run: terraform apply -auto-approve
 
-    - name: Install MySQL Client
-      run: sudo apt-get update && sudo apt-get install -y mysql-client
+    # - name: Install MySQL Client
+    #   run: sudo apt-get update && sudo apt-get install -y mysql-client
 
-    - name: Create Application Database
-      run: |
-        echo "Waiting for RDS to be available..."
-        sleep 120  # Aguarda 2 minutos para garantir que o RDS esteja pronto
+    # - name: Create Application Database
+    #   run: |
+    #     echo "Waiting for RDS to be available..."
+    #     sleep 120  # Aguarda 2 minutos para garantir que o RDS esteja pronto
 
-        mysql -h $(terraform output -raw db_endpoint) \
-              -u $(terraform output -raw db_username) \
-              -p"${{ secrets.AWS_SECRET_DB_PASS }}" \
-              < scripts/setup_database.sql
-      env:
-        DB_PASSWORD: ${{ secrets.AWS_SECRET_DB_PASS }}
+    #     mysql -h $(terraform output -raw db_endpoint) \
+    #           -u $(terraform output -raw db_username) \
+    #           -p"${{ secrets.AWS_SECRET_DB_PASS }}" \
+    #           < scripts/setup_database.sql
+    #   env:
+    #     DB_PASSWORD: ${{ secrets.AWS_SECRET_DB_PASS }}
