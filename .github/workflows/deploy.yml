@@ -21,12 +21,11 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}  # Adicionamos o token de segurança
+        AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
       run: |
-        # Configura as credenciais AWS diretamente
         echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
         echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
-        echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV  # Adicionamos o token de segurança
+        echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV
         echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV
 
     - name: Terraform Init
@@ -46,9 +45,12 @@ jobs:
 
     - name: Create Application Database
       run: |
+        echo "Waiting for RDS to be available..."
+        sleep 120  # Aguarda 2 minutos para garantir que o RDS esteja pronto
+
         mysql -h $(terraform output -raw db_endpoint) \
               -u $(terraform output -raw db_username) \
               -p"${{ secrets.AWS_SECRET_DB_PASS }}" \
               < scripts/setup_database.sql
       env:
-        DB_PASSWORD: ${{ secrets.AWS_SECRET_DB_PASS }}  
+        DB_PASSWORD: ${{ secrets.AWS_SECRET_DB_PASS }}
