@@ -15,6 +15,8 @@ variable "db_username" {
 
 variable "db_password" {
   description = "Database password"
+  type        = string
+  sensitive   = true
 }
 
 variable "db_instance_class" {

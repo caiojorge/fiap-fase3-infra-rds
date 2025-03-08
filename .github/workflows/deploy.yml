@@ -1,10 +1,10 @@
 name: Deploy RDS Infrastructure
 
 on:
-  pull_request: 
+  pull_request:
     branches:
       - main
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -34,12 +34,16 @@ jobs:
     - name: Terraform Validate
       run: terraform validate
 
+    # Se quiser exibir o plano antes de aplicar, descomente:
     # - name: Terraform Plan
     #   run: terraform plan
 
     - name: Terraform Apply
       run: terraform apply -auto-approve
+      env:
+        TF_VAR_db_password: ${{ secrets.AWS_SECRET_DB_PASS }}
 
+    # Exemplo de passo para criar database/tables via script SQL (opcional):
     # - name: Install MySQL Client
     #   run: sudo apt-get update && sudo apt-get install -y mysql-client
 
@@ -52,5 +56,3 @@ jobs:
     #           -u $(terraform output -raw db_username) \
     #           -p"${{ secrets.AWS_SECRET_DB_PASS }}" \
     #           < scripts/setup_database.sql
-    #   env:
-    #     DB_PASSWORD: ${{ secrets.AWS_SECRET_DB_PASS }}
