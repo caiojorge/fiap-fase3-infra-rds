@@ -122,7 +122,7 @@ resource "aws_security_group" "rds_sg" {
 resource "aws_db_instance" "default" {
   allocated_storage      = var.db_allocated_storage
   engine                 = "mysql"
-  # engine_version         = "8.0.32"
+  engine_version         = "8.0.40"
   instance_class         = var.db_instance_class
   db_name                = var.db_name
   username               = var.db_username
