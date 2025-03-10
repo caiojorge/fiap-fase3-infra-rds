@@ -10,11 +10,19 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 }
 
-# Subnet pública (usada pelo NAT Gateway)
-resource "aws_subnet" "public_subnet" {
+# Subnet pública 1 (us-east-1a)
+resource "aws_subnet" "public_subnet_a" {
   vpc_id                  = aws_vpc.main.id
   cidr_block             = "10.0.0.0/24"
   availability_zone       = "${var.region}a"
+  map_public_ip_on_launch = true
+}
+
+# Subnet pública 2 (us-east-1b)
+resource "aws_subnet" "public_subnet_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block             = "10.0.1.0/24"
+  availability_zone       = "${var.region}b"
   map_public_ip_on_launch = true
 }
 
@@ -28,9 +36,15 @@ resource "aws_route_table" "public_rt" {
   }
 }
 
-# Associação da subnet pública com a route table pública
-resource "aws_route_table_association" "public_rta" {
-  subnet_id      = aws_subnet.public_subnet.id
+# Associação da subnet pública 1 com a route table pública
+resource "aws_route_table_association" "public_rta_a" {
+  subnet_id      = aws_subnet.public_subnet_a.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+# Associação da subnet pública 2 com a route table pública
+resource "aws_route_table_association" "public_rta_b" {
+  subnet_id      = aws_subnet.public_subnet_b.id
   route_table_id = aws_route_table.public_rt.id
 }
 
@@ -42,20 +56,20 @@ resource "aws_eip" "nat_eip" {
 # NAT Gateway (para subnets privadas)
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.public_subnet.id
+  subnet_id     = aws_subnet.public_subnet_a.id
 }
 
-# Agora duas subnets privadas para o RDS:
+# Subnets privadas (opcional, se ainda precisar delas)
 resource "aws_subnet" "private_subnet_a" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block             = "10.0.1.0/24"
+  cidr_block             = "10.0.2.0/24"
   availability_zone       = "${var.region}a"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "private_subnet_b" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block             = "10.0.2.0/24"
+  cidr_block             = "10.0.3.0/24"
   availability_zone       = "${var.region}b"
   map_public_ip_on_launch = false
 }
@@ -86,7 +100,8 @@ resource "aws_route_table_association" "private_rta_b" {
 resource "aws_db_subnet_group" "default" {
   name       = "main-subnet-group"
   subnet_ids = [
-    aws_subnet.public_subnet.id,  # Agora usando a subnet pública
+    aws_subnet.public_subnet_a.id,
+    aws_subnet.public_subnet_b.id
   ]
 }
 
@@ -98,13 +113,11 @@ resource "aws_security_group" "rds_sg" {
   description = "Allow MySQL inbound traffic"
   vpc_id      = aws_vpc.main.id
 
-  # Atenção: abrir 3306 para 0.0.0.0/0 não é seguro em produção.
-  # Restringir ao seu IP fixo ou bastion host, se possível.
   ingress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]  # Restrinja isso em produção!
   }
 
   egress {
