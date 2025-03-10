@@ -28,28 +28,8 @@ jobs:
         echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV
         echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV
 
-    # --------------------------
-    # Etapa 1: criar o bucket S3 via backend local/temporário
-    # --------------------------
-    - name: Terraform Init (local)
-      run: terraform init -backend=false
-
-    - name: Terraform Apply Bucket
-      run: terraform apply -auto-approve -target=aws_s3_bucket.terraform_state_bucket
-      env:
-        TF_VAR_db_password: ${{ secrets.AWS_SECRET_DB_PASS }}
-
-    # --------------------------
-    # Etapa 2: "Ativar" o backend S3 e recriar o .tfstate lá
-    # --------------------------
-    - name: Enable remote backend
-      run: |
-        mv backend-remote.tf backend.tf  # rename ou copie para 'backend.tf'
-        ls -l    
-
     - name: Terraform Init
-      # run: terraform init
-      run: terraform init -reconfigure
+      run: terraform init
 
     - name: Terraform Validate
       run: terraform validate
@@ -64,15 +44,15 @@ jobs:
         TF_VAR_db_password: ${{ secrets.AWS_SECRET_DB_PASS }}
 
     # Exemplo de passo para criar database/tables via script SQL (opcional):
-    - name: Install MySQL Client
-      run: sudo apt-get update && sudo apt-get install -y mysql-client
+    # - name: Install MySQL Client
+    #   run: sudo apt-get update && sudo apt-get install -y mysql-client
 
-    - name: Create Application Database
-      run: |
-        echo "Waiting for RDS to be available..."
-        sleep 120  # Aguarda 2 minutos para garantir que o RDS esteja pronto
+    # - name: Create Application Database
+    #   run: |
+    #     echo "Waiting for RDS to be available..."
+    #     sleep 120  # Aguarda 2 minutos para garantir que o RDS esteja pronto
 
-        mysql -h $(terraform output -raw db_endpoint) \
-              -u $(terraform output -raw db_username) \
-              -p"${{ secrets.AWS_SECRET_DB_PASS }}" \
-              < scripts/setup_database.sql
+    #     mysql -h $(terraform output -raw db_endpoint) \
+    #           -u $(terraform output -raw db_username) \
+    #           -p"${{ secrets.AWS_SECRET_DB_PASS }}" \
+    #           < scripts/setup_database.sql
