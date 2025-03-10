@@ -86,8 +86,7 @@ resource "aws_route_table_association" "private_rta_b" {
 resource "aws_db_subnet_group" "default" {
   name       = "main-subnet-group"
   subnet_ids = [
-    aws_subnet.private_subnet_a.id,
-    aws_subnet.private_subnet_b.id
+    aws_subnet.public_subnet.id,  # Agora usando a subnet pública
   ]
 }
 
@@ -129,7 +128,7 @@ resource "aws_db_instance" "default" {
   password               = var.db_password
   parameter_group_name   = "default.mysql8.0"
   skip_final_snapshot    = true
-  publicly_accessible    = false  # Mantido privado
+  publicly_accessible    = true  # Agora público
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 }
