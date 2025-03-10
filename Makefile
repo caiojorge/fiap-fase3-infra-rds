@@ -6,3 +6,6 @@ commit:
 
 push:
 	git push origin main
+
+revert:
+	git revert "$(m)"	
