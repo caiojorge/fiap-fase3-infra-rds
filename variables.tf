@@ -5,7 +5,7 @@ variable "region" {
 
 variable "db_name" {
   description = "Database name"
-  default     = "mydatabase"
+  default     = "dbcontrol"
 }
 
 variable "db_username" {
