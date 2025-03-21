@@ -1,24 +1,24 @@
-# senhas do banco
-- abcABC09_
-- ASIA2RJFTLHEIVE6YUNI
-- ASIA2RJFTLHEOB6WYTUK
-- ASIA2RJFTLHEIFSKRHGR
-- ASIA2RJFTLHEMZ4YQZL6
-- ASIA2RJFTLHEK74I2FGF
+# 
+# Kitchen Control | fase 3
+
+## Executar action para criar o banco de dados
+- https://github.com/caiojorge/fiap-fase3-infra-rds/actions
 
 
-# git
+## Secrets github action    
+- substituir as secrets no github pelos valores indicados pela AWS
 
 ```
-Não exatamente. O comando `git revert` cria um novo commit que desfaz as mudanças introduzidas pelo commit especificado. Se você quiser reverter o commit mais recente e voltar ao estado do commit "mudando para t3.micro", você deve reverter o commit mais recente (`c587cc21b58bccb2a0dcbae85702f09770876ee9`).
+AWS_ACCESS_KEY_ID = id no aws
+AWS_SECRET_ACCESS_KEY = key no aws
+AWS_SESSION_TOKEN = token no aws
+AWS_SECRET_DB_PASS = senha (pura, sem a base64)
+```        
+- fazer isso para todos os projetos
 
-Para reverter o último commit e voltar ao estado do commit "mudando para t3.micro", você deve usar:
+## Executar a action
+- Temos 2 formas de iniciar a action
+  - via pull_request
+  - via workflow_dispatch
 
-
-git revert c587cc21b58bccb2a0dcbae85702f09770876ee9
-
-
-Isso criará um novo commit que desfaz as mudanças introduzidas pelo commit `c587cc21b58bccb2a0dcbae85702f09770876ee9`, mantendo o histórico do Git intacto e efetivamente retornando o código ao estado do commit "mudando para t3.micro".
-
-Se você quiser reverter múltiplos commits, você pode fazer isso em sequência ou usar um intervalo de commits. No entanto, para o seu caso específico, reverter o último commit deve ser suficiente.
-```
+# 
